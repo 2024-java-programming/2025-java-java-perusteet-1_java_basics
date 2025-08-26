@@ -1,0 +1,88 @@
+name: Autograding Tests
+on:
+  - push
+  - workflow_dispatch
+  - repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    ### STEPS ###
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+    - name: Test Multiplier
+      id: multi_test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: "Multiplier"
+        command: gradle test --tests MultiplierTest
+        timeout: 5
+        max-score: 1
+    - name: Test Checker
+      id: check_test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: "Checker"
+        command: gradle test --tests CheckerTest
+        timeout: 5
+        max-score: 1
+    - name: Test EvenOdd
+      id: eveno_test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: "EvenOdd"
+        command: gradle test --tests EvenOddTest
+        timeout: 5
+        max-score: 1
+    - name: Test Greeting
+      id: greet_test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: "Greeting"
+        command: gradle test --tests GreetingTest
+        timeout: 5
+        max-score: 1
+    - name: Test Factorial
+      id: facto_test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: "Factorial"
+        command: gradle test --tests FactorialTest
+        timeout: 5
+        max-score: 1
+    - name: Fibonacci
+      id: fibon_test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: "Fibonacci"
+        command: gradle test --tests FibonacciTest
+        timeout: 5
+        max-score: 1
+    - name: Debug Test 
+      run: |
+        echo "Debug: ${{steps.multi_test.outputs.result}}"        
+        echo "Debug: ${{steps.check_test.outputs.result}}"        
+        echo "Debug: ${{steps.eveno_test.outputs.result}}"        
+        echo "Debug: ${{steps.greet_test.outputs.result}}"        
+        echo "Debug: ${{steps.facto_test.outputs.result}}"        
+        echo "Debug: ${{steps.fibon_test.outputs.result}}"        
+    - name: Autograding Report
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env: 
+        MULTI_TEST_RESULTS: "${{steps.multi_test.outputs.result}}"
+        CHECK_TEST_RESULTS: "${{steps.check_test.outputs.result}}"
+        EVENO_TEST_RESULTS: "${{steps.eveno_test.outputs.result}}"
+        GREET_TEST_RESULTS: "${{steps.greet_test.outputs.result}}"
+        FACTO_TEST_RESULTS: "${{steps.facto_test.outputs.result}}"
+        FIBON_TEST_RESULTS: "${{steps.fibon_test.outputs.result}}"
+      with:
+        runners: multi_test,check_test,eveno_test,greet_test,facto_test,fibon_test
